@@ -1,1 +1,1 @@
-model eğitimi
+python src/train.py
