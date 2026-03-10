@@ -4,8 +4,8 @@
 
 # Veri setleri ve Modeller
 *.csv
-*.pkl
 *.xlsx
+*.pkl
 
 # IDE ve Sistem dosyaları
 .vscode/
