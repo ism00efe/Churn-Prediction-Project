@@ -1,1 +1,14 @@
-.gitignore
+# Python geçici dosyaları
+**/__pycache__/
+*.pyc
+
+# Veri setleri ve Modeller
+*.csv
+*.pkl
+*.xlsx
+
+# IDE ve Sistem dosyaları
+.vscode/
+.idea/
+.DS_Store
+*.egg-info/

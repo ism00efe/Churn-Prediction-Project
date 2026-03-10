@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.ipynb
+data/raw/
+.git/
+churn_prediction.egg-info/
