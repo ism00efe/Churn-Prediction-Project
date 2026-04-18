@@ -1,32 +1,35 @@
-# 🚀 End-to-End Churn Prediction Pipeline
+# Churn Prediction Pipeline & API
 
-Bu proje, telekomünikasyon sektöründeki müşteri kaybını (churn) tahmin etmek amacıyla geliştirilmiş, **uçtan uca çalışan bir makine öğrenmesi üretim hattıdır (pipeline).** Tek seferlik kod blokları yerine; veri temizleme, özellik mühendisliği, hiperparametre optimizasyonu, kalibrasyon ve API/UI entegrasyonu süreçlerinin tamamı modüler ve tekrar edilebilir bir mimaride kurgulanmıştır.
+Bu proje, telekom müşterilerinin servisi terk etme (churn) olasılığını tahmin eden ve bu tahminleri bir REST API / Web arayüzü ile sunan uçtan uca bir makine öğrenmesi hattıdır. 
+
+Projenin temel amacı sadece bir model eğitmek değil; veri temizleme, özellik mühendisliği ve canlıya alma (deployment) süreçlerini modüler, tekrar edilebilir ve otomatize edilebilir bir mimaride kurgulamaktır.
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-%23FE4B4B.svg?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 
-## 🎯 Projenin Vizyonu ve Ürünleşme Mantığı
+## Mimari ve Tasarım Kararları
 
-Modeli eğitip Jupyter Notebook'ta bırakmak yerine, gerçek dünya senaryolarına entegre edilebilir bir **otomasyon hattı** tasarlandı:
-1. **Modüler Veri Mühendisliği:** `src/` dizini altındaki fonksiyonlarla (`Data.py`, `features.py`) veriler dinamik olarak temizlenir, eşik değer altı korelasyonlar silinir ve One-Hot/Binary encodig işlemleri otomatize edilir.
-2. **Kâr Odaklı Değerlendirme:** Model sadece doğruluk (accuracy) ile değil, iş mantığına (business logic) uygun olarak "İyimser, Gerçekçi ve Ters Etkili" kâr senaryolarıyla (`evaluate.py`) F2-Score üzerinden değerlendirilmiştir.
-3. **Canlıya Alma (Deployment):** Eğitilen ve kalibre edilen model (Logistic Regression + Isotonic Calibration), **FastAPI** ile bir REST endpoint'ine ve **Streamlit** ile son kullanıcı arayüzüne dönüştürülmüştür. Tüm sistem **Docker** ile konteynerize edilerek platform bağımsız hale getirilmiştir.
+Geliştirme sürecinde "Jupyter Notebook karmaşasından" kaçınmak ve kodu ürünleşmeye hazır (production-ready) hale getirmek için şu mimari kararları uyguladım:
 
-## 📂 Mimari Yapı (Directory Structure)
+* **Modüler Yapı (`src/`):** Veri işleme, özellik mühendisliği ve eğitim adımlarını tek bir dosyaya yığmak yerine fonksiyonel olarak böldüm.
+* **Merkezi Konfigürasyon (`config.py`):** Korelasyon sınırları (threshold=0.10) ve silinecek sütunlar gibi hiperparametreleri tek bir noktadan yöneterek hard-code kullanımını engelledim.
+* **İş Mantığı Odaklı Değerlendirme (`evaluate.py`):** Modelin başarısını sadece standart metriklerle (Accuracy, F1) değil; V_cost ve C_cost gibi parametreler kullanarak iyimser/gerçekçi net kâr (net profit) senaryolarıyla ölçtüm.
+* **API ve Konteynerizasyon:** Eğitilen model (Logistic Regression + Isotonic Calibration), FastAPI kullanılarak bir servise dönüştürüldü ve Docker ile platform bağımsız çalışabilir hale getirildi.
+
+## Dizin Yapısı
+
 ```text
-├── App/                    # Streamlit veya FastAPI uygulama dosyaları
-├── Models/                 # Kalibre edilmiş .pkl modeli
-├── data/                   # raw/ (ham) ve processed/ (işlenmiş) veri setleri
-├── src/                    # Çekirdek Pipeline Modülleri
-│   ├── config.py           # Korelasyon eşikleri, düşürülecek sütunlar vb. merkezi ayarlar
-│   ├── Data.py             # Veri temizleme orkestratörü
-│   ├── features.py         # Özellik mühendisliği, ColumnTransformer, Scaler
-│   ├── evaluate.py         # Confusion matrix ve Net Kâr hesaplama senaryoları
-│   ├── data_loader.py      # Train/Test ayırma ve veri okuma
-│   └── Train.py            # GridSearchCV ile model eğitimi ve pipeline inşası
-├── app.py                  # Streamlit Arayüzü
-├── Main.py                 # FastAPI Uygulaması
-├── Dockerfile              # Konteynerizasyon ayarları
-└── requirements.txt        # Bağımlılıklar
+├── App/                    # Streamlit ve FastAPI arayüz kodları
+├── Models/                 # Eğitilmiş ve kalibre edilmiş .pkl modeli
+├── data/                   # Ham ve işlenmiş veri setleri (raw/ & processed/)
+├── src/                    
+│   ├── config.py           # Proje parametreleri ve eşik değerler
+│   ├── Data.py             # Veri temizleme adımları
+│   ├── features.py         # Encoding ve ColumnTransformer işlemleri
+│   ├── evaluate.py         # Confusion matrix tabanlı kâr hesaplamaları
+│   ├── data_loader.py      # Veri okuma ve train/test ayırma
+│   └── Train.py            # GridSearchCV ile model eğitimi
+├── app.py                  # Streamlit UI
+├── Main.py                 # FastAPI Endpoint'leri
+└── Dockerfile              # Konteyner imaj tanımları
