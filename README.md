@@ -1,264 +1,246 @@
-<<<<<<< HEAD
-# End-to-End Churn Prediction Pipeline & API
-=======
-# Churn Prediction Pipeline
->>>>>>> 821d396 (README dosyası güncellendi)
+# Churn Prediction Project
 
-Telekom musterilerinin churn (abonelik iptali) olasiligini tahmin eden, uctan uca bir makine ogrenmesi projesi.
+This repository contains an end-to-end customer churn prediction workflow built on the Telco Customer Churn dataset.  
+The project covers data cleaning, feature engineering, model training with hyperparameter optimization, probability calibration, and two serving interfaces:
 
-<<<<<<< HEAD
-Projenin temel amacı sadece klasik bir model eğitmek değil; veri temizleme, özellik mühendisliği ve canlıya alma (deployment) süreçlerini modüler, tekrar edilebilir ve otomatize edilebilir bir mimaride kurgulamaktır. Çalışmada endüstri standardı olan Telco Customer Churn veri seti kullanılmıştır.
+- A REST API with FastAPI
+- An interactive UI with Streamlit
 
-**🚀 Canlı Demo:** [Hugging Face Space Linkini Buraya Ekle]
-=======
-Proje; veri temizleme, ozellik muhendisligi, model egitimi, kalibrasyon, API sunumu ve Streamlit arayuzunu tek bir yapida birlestirir.
->>>>>>> 821d396 (README dosyası güncellendi)
+## Project Scope
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-%23FE4B4B.svg?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-<<<<<<< HEAD
-[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/)
+Primary objective: estimate customer churn probability and support retention decision-making with threshold-based risk classification.
 
-## 📸 Arayüz (Streamlit UI)
+Implemented capabilities:
 
-![Churn App](arayuz_gorseli_linki.png) *(Buraya repoya yüklediğin arayüz görselinin yolunu koy)*
+- Data preprocessing and cleaning pipeline
+- Structured feature engineering for mixed categorical/numeric data
+- Logistic Regression training with `GridSearchCV` and `F2`-focused scoring
+- Probability calibration with isotonic calibration
+- Model persistence to disk (`joblib`)
+- Online inference via FastAPI and Streamlit
 
-## 🏗️ Mimari ve Tasarım Kararları
-
-Geliştirme sürecinde araştırma kodlarını (Jupyter Notebook) ürünleşmeye hazır (production-ready) hale getirmek için şu mimari kararlar uygulanmıştır:
-
-* **Modüler Pipeline (`src/`):** Veri işleme, özellik mühendisliği ve eğitim adımları tek bir dosyaya yığılmak yerine fonksiyonel olarak izole edilmiştir.
-* **Merkezi Konfigürasyon (`config.py`):** Korelasyon sınırları (threshold=0.10) ve silinecek sütunlar gibi hiperparametreler tek bir noktadan yönetilerek hard-code kullanımı engellenmiştir.
-* **İş Mantığı Odaklı Değerlendirme:** Modelin başarısı sadece standart metriklerle değil; müşteri kazanım ve kayıp maliyetleri (V_cost, C_cost) üzerinden oluşturulan kâr/zarar senaryolarıyla ölçülmüştür. Bu nedenle model, *Recall* değerini maksimize edecek şekilde (F2-Score) optimize edilmiştir.
-* **Kalibrasyon:** Model çıktıları sadece 0 ve 1'den ibaret olmaması ve gerçek olasılık değerleri üretmesi için `CalibratedClassifierCV` (Isotonic) kullanılarak kalibre edilmiştir.
-
-## 📊 Model Performansı
-
-Logistic Regression modeli GridSearchCV ile hiperparametre optimizasyonuna sokulmuş ve aşağıdaki sonuçlar elde edilmiştir:
-
-* **Accuracy:** [% XX]
-* **Recall (Churn Sınıfı İçin):** [% XX] -> *(Özellikle bu metrik yüksek tutulmaya çalışılmıştır)*
-* **F2-Score:** [% XX]
-
-*Not: Detaylı Keşifsel Veri Analizi (EDA) ve model denemeleri `01_eda.ipynb` ve `02_modeling.ipynb` dosyalarında bulunabilir.*
-
-## 📂 Dizin Yapısı
-
-```text
-├── App/                    # Streamlit ve FastAPI arayüz kodları
-├── Models/                 # Eğitilmiş ve kalibre edilmiş model (.pkl)
-├── data/                   # Ham ve işlenmiş veri setleri
-├── src/                    
-│   ├── config.py           # Proje parametreleri ve maliyet senaryoları
-│   ├── Data.py             # Veri temizleme orkestrasyonu
-│   ├── features.py         # Encoding ve bellek optimizasyonu
-│   ├── evaluate.py         # Confusion matrix tabanlı finansal hesaplamalar
-│   └── Train.py            # Modelin eğitilmesi ve dışa aktarılması
-├── app.py                  # Streamlit UI
-├── Main.py                 # FastAPI Endpoint'leri
-└── Dockerfile              # Konteyner imaj tanımları
-=======
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-Modeling-orange?style=for-the-badge&logo=scikitlearn)](https://scikit-learn.org/)
-
-## Icerik
-
-- [Proje Ozeti](#proje-ozeti)
-- [Teknoloji Yigini](#teknoloji-yigini)
-- [Klasor Yapisi](#klasor-yapisi)
-- [Kurulum](#kurulum)
-- [Veri Isleme ve Model Egitimi](#veri-isleme-ve-model-egitimi)
-- [FastAPI Servisi](#fastapi-servisi)
-- [Streamlit Uygulamasi](#streamlit-uygulamasi)
-- [Docker ile Calistirma](#docker-ile-calistirma)
-- [Modelleme Notlari](#modelleme-notlari)
-- [Katki ve Gelistirme Notlari](#katki-ve-gelistirme-notlari)
-
-## Proje Ozeti
-
-Bu repo, churn tahminini sadece bir notebook deneyi olmaktan cikarip tekrar calistirilabilir bir urunlestirme hattina tasir.
-
-Ana hedefler:
-
-- Temiz ve moduler bir veri-hazirlama yapisi kurmak
-- Is odakli bir performans bakisi (net kar senaryolari) eklemek
-- Egitilen modeli API ve web arayuz uzerinden servis etmek
-- Docker ile ortama bagimli olmayan calistirma saglamak
-
-## Teknoloji Yigini
-
-- Python 3.11+
-- pandas, numpy
-- scikit-learn
-- FastAPI + Uvicorn
-- Streamlit
-- Docker
-- Jupyter Notebook (EDA ve deneysel calismalar)
-
-## Klasor Yapisi
+## Repository Structure
 
 ```text
 .
-|-- App/
-|   |-- Main.py              # FastAPI endpoint'leri
-|   `-- app.py               # Streamlit arayuzu
-|-- Models/
-|   `-- Model.pkl            # Egitilmis model (pipeline)
-|-- Nootbooks/               # EDA ve modelleme not defterleri
-|-- Tests/
-|   `-- test_data.py
-|-- src/
-|   |-- config.py            # Merkezi parametreler
-|   |-- Data.py              # Veri temizleme
-|   |-- data_loader.py       # Veri okuma ve train/test ayirma
-|   |-- evaluate.py          # Esik ve net kar hesaplari
-|   |-- features.py          # Encoding, secim, preprocessing
-|   `-- Train.py             # Egitim + GridSearchCV + kalibrasyon
-|-- requirements.txt
-|-- Dockerfile
-`-- README.md
+├── App/
+│   ├── Main.py              # FastAPI service
+│   └── app.py               # Streamlit interface
+├── Models/
+│   └── Model.pkl            # Trained calibrated model artifact
+├── Nootbooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_modeling.ipynb
+│   └── 03.ipynb
+├── data/
+│   ├── Raw/
+│   │   └── WA_Fn-UseC_-Telco-Customer-Churn.csv
+│   └── processed/
+│       └── cleaned_data.csv
+├── src/
+│   ├── config.py            # Constants, paths, business scenario parameters
+│   ├── Data.py              # Data cleaning
+│   ├── features.py          # Feature engineering + preprocessing
+│   ├── data_loader.py       # IO and train/test split helpers
+│   ├── Train.py             # Training entry point
+│   └── evaluate.py          # Confusion-matrix and net-profit utilities
+├── requirements.txt
+└── pyproject.toml
 ```
 
-## Kurulum
+## Dataset
 
-### 1) Repoyu klonlayin
+- **Dataset**: [IBM Telco Customer Churn](https://www.kaggle.com/datasets/palashfendarkar/wa-fnusec-telcocustomerchurn) (`WA_Fn-UseC_-Telco-Customer-Churn.csv`)
+- **Task**: Binary classification (`Churn`)
+- **Target column**: `Churn`
+- **Current local location**: `data/Raw/WA_Fn-UseC_-Telco-Customer-Churn.csv`
+
+### Cleaning and preparation steps
+
+Data processing currently applies the following logic:
+
+1. Convert `TotalCharges` to numeric (`TotalCharges_num`) with coercion
+2. Drop rows where `TotalCharges_num` is null
+3. Drop rows where `tenure == 0`
+4. Remove configured columns (`customerID`, `TotalCharges`)
+5. Encode binary fields (`Yes/No`, `gender`) to numeric
+6. Encode ordinal-like categorical fields (`Contract`, `MultipleLines`)
+7. One-hot encode selected columns (`InternetService`, `PaymentMethod`)
+8. Remove low-correlation columns (threshold from config)
+9. Drop configured multicollinearity columns
+10. Optimize dtypes and export processed dataset
+
+## Modeling Pipeline
+
+Training pipeline is implemented in `src/Train.py`.
+
+- **Base estimator**: `LogisticRegression`
+- **Preprocessing**: `ColumnTransformer` + `StandardScaler` for non-binary numeric columns
+- **Hyperparameter search**: `GridSearchCV` (5-fold CV)
+- **Optimization metric**: `F-beta` with `beta=2` (`F2`), favoring recall
+- **Calibration**: `CalibratedClassifierCV(method="isotonic", cv=5)`
+- **Saved artifact**: `Models/Model.pkl`
+
+## Model Performance
+
+Final test metrics (from `Nootbooks/02_modeling.ipynb`, tuning sonrası):
+
+| Metric | Value |
+| :--- | ---: |
+| Accuracy | 0.7235 |
+| Precision (Churn=1) | 0.4876 |
+| Recall (Churn=1) | 0.7914 |
+| F1 Score (Churn=1) | 0.6035 |
+| F2 Score (Churn=1) | 0.7038 |
+
+### Hyperparameters searched
+
+- `clf__C`: `[0.01, 0.1, 1, 10]`
+- `clf__class_weight`:
+  - `None`
+  - `"balanced"`
+  - `{0: 1, 1: 1.5}`
+  - `{0: 1, 1: 2}`
+
+## Business Evaluation Utilities
+
+`src/evaluate.py` includes helpers for decision-threshold and business impact analysis:
+
+- `calculate_confusion_matrix_metrics(...)`
+- `calculate_net_profit(...)`
+
+Scenario parameters (`v_cost`, `c_cost`, `r_rate`, `negative_impact_rate`) are defined in `src/config.py`.
+
+## Installation
+
+### 1) Clone repository
 
 ```bash
-git clone <repo-url>
+git clone <your-repository-url>
 cd Churn-Prediction-Project-1
 ```
 
-### 2) Sanal ortam olusturun
-
-Windows (PowerShell):
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-macOS / Linux:
+### 2) Create virtual environment
 
 ```bash
 python -m venv .venv
+```
+
+Activate environment:
+
+- **Windows (PowerShell)**:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+- **Linux / macOS**:
+
+```bash
 source .venv/bin/activate
 ```
 
-### 3) Bagimliliklari yukleyin
+### 3) Install dependencies
 
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## Veri Isleme ve Model Egitimi
+## Training Workflow
 
-Model egitimi icin:
+Run model training:
 
 ```bash
 python -m src.Train
 ```
 
-Bu adim:
+What this run does:
 
-- Ham veriyi yukler
-- Temizleme ve ozellik muhendisligi uygular
-- Islenmis veriyi `data/processed/cleaned_data.csv` olarak kaydeder
-- `LogisticRegression` modeli icin `GridSearchCV` uygular
-- Secilen modeli isotonic calibration ile kalibre eder
-- Son modeli `Models/Model.pkl` olarak kaydeder
+- Reads raw data
+- Applies cleaning + feature engineering
+- Writes processed file to `data/processed/cleaned_data.csv`
+- Trains and calibrates model
+- Saves model to `Models/Model.pkl`
 
-## FastAPI Servisi
+## Run FastAPI Service
 
-API'yi lokal calistirmak icin:
+Start API server:
 
 ```bash
-uvicorn App.Main:app --reload
+uvicorn App.Main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Varsayilan adresler:
+Available endpoints:
 
-- API: `http://127.0.0.1:8000`
-- Swagger UI: `http://127.0.0.1:8000/docs`
-- Health check: `http://127.0.0.1:8000/health`
+- `GET /`
+- `GET /health`
+- `POST /predict`
+- Interactive docs: `http://127.0.0.1:8000/docs`
 
-### Ornek `POST /predict` istegi
+### Example prediction request
+
+```bash
+curl -X POST "http://127.0.0.1:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "SeniorCitizen": 0,
+    "Partner": 1,
+    "Dependents": 0,
+    "tenure": 24,
+    "OnlineBackup": 1,
+    "DeviceProtection": 1,
+    "OnlineSecurity": 1,
+    "TechSupport": 0,
+    "Contract": 1,
+    "PaperlessBilling": 1,
+    "MonthlyCharges": 74.5,
+    "InternetService_DSL": 0,
+    "InternetService_Fiber optic": 1,
+    "InternetService_No": 0,
+    "PaymentMethod_Bank transfer (automatic)": 0,
+    "PaymentMethod_Credit card (automatic)": 1,
+    "PaymentMethod_Electronic check": 0
+  }'
+```
+
+Expected response format:
 
 ```json
 {
-  "SeniorCitizen": 0,
-  "Partner": 1,
-  "Dependents": 0,
-  "tenure": 24,
-  "OnlineBackup": 1,
-  "DeviceProtection": 1,
-  "OnlineSecurity": 0,
-  "TechSupport": 0,
-  "Contract": 1,
-  "PaperlessBilling": 1,
-  "MonthlyCharges": 79.9,
-  "InternetService_DSL": 0,
-  "InternetService_Fiber optic": 1,
-  "InternetService_No": 0,
-  "PaymentMethod_Bank transfer (automatic)": 0,
-  "PaymentMethod_Credit card (automatic)": 0,
-  "PaymentMethod_Electronic check": 1
-}
-```
-
-Ornek cevap:
-
-```json
-{
-  "churn_probability": 0.7362,
+  "churn_probability": 0.4123,
   "will_churn": true,
   "applied_threshold": 0.4
 }
 ```
 
-## Streamlit Uygulamasi
+## Run Streamlit App
 
-Web arayuzunu baslatmak icin:
+Start local UI:
 
 ```bash
 streamlit run App/app.py
 ```
 
-Arayuz, kullanicidan musteri bilgilerini alir ve churn olasiligini yuzdesel olarak gosterir.
+The Streamlit app loads `Models/Model.pkl`, collects feature inputs from the form, and displays churn risk according to the current threshold (`0.4`).
 
-## Docker ile Calistirma
+## Reproducibility Notes
 
-### 1) Image olusturun
+- `RANDOM_STATE` is set to `42`
+- Test split uses stratified split with `test_size=0.2`
+- Paths for processed data and model output are centralized in `src/config.py`
+- Training should be run before API/UI inference if `Models/Model.pkl` is missing
 
-```bash
-docker build -t churn-prediction .
-```
+## Known Constraints
 
-### 2) Container baslatin
+- Folder naming is currently `Nootbooks/` (intentional as in repository state)
+- Raw dataset is referenced in code as `data/raw/...` but repository folder is `data/Raw/...`; use consistent casing in your environment to avoid path issues
+- `requirements.txt` includes broad notebook/UI dependencies in addition to training/runtime packages
 
-```bash
-docker run -p 8000:8000 churn-prediction
-```
+## Future Improvements
 
-Sonrasinda API'ye `http://localhost:8000/docs` adresinden erisebilirsiniz.
-
-## Modelleme Notlari
-
-- Temel model: `LogisticRegression`
-- Optimizasyon: `GridSearchCV` (F2 odakli skor)
-- Kalibrasyon: `CalibratedClassifierCV` (`isotonic`)
-- Karar esigi: API katmaninda `0.4`
-- Is degeri: `src/evaluate.py` icinde net kar senaryo hesaplari
-
-## Katki ve Gelistirme Notlari
-
-Onerilen gelistirmeler:
-
-- Test kapsamini genisletmek (`Tests/`)
-- Veri dogrulama ve schema kontrollerini artirmak
-- Model versiyonlama (MLflow / DVC benzeri araclar)
-- CI/CD pipeline eklemek
-
----
-
-Herhangi bir sorunda issue acabilir veya pull request gonderebilirsiniz.
->>>>>>> 821d396 (README dosyası güncellendi)
+- Add `pytest` coverage for cleaning, feature engineering, and API schema validation
+- Add model/version metadata and experiment tracking
+- Add Dockerfile and containerized run flow for API and Streamlit
+- Add CI pipeline (lint, test, train smoke test)
+- Add threshold tuning report and calibrated probability diagnostics
